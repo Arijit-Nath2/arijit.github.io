@@ -1,16 +1,23 @@
 ---
-title: "FinalAssignment"
+title: "MT5000 Quarto Assignment"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE,message = FALSE,warning = FALSE)
 ```
 
 ```{r cars}
 library(tidyverse)
 library(ggplot2)              
 library(plotly)
+if (!require("mapdata")) install.packages("mapdata", dependencies = TRUE)
+library(mapdata)
+if (!require("cowplot")) install.packages("cowplot", dependencies = TRUE)
+library(cowplot)
+if (!require("magick")) install.packages("magick", dependencies = TRUE)
+library(magick)
+
 ```
 
 # Introduction
@@ -23,9 +30,13 @@ Every year, millions of children die before reaching their fifth birthday due to
 We will be using two datasets provided by UNICEF: unicef_indicator_1.csv and unicef_indicator_2.csv. These datasets contain information on child mortality rates and health indicators for different countries. We will also be using the metadata file unicef_metadata.csv to help us understand the variables in our datasets.
 
 ```{r}
-unicef_indicator <- read.csv("unicef_indicator_2.csv")
+unicef_indicator <- read.csv("unicef_indicator_1.csv")
 
-plot <- ggplot(unicef_indicator, aes(x = time_period, y = obs_value, fill = region)) +
+unicef_indicator2 <- read.csv("unicef_indicator_2.csv")
+unicef_metadata <- read.csv("unicef_metadata1.csv")
+
+
+plot <- ggplot(unicef_indicator2, aes(x = time_period, y = obs_value, fill = region)) +
   geom_bar(stat = "identity") +
   labs(x = NULL, y = "% of children treated (< age 5)", title = "Treatment ") +
   guides(fill = FALSE)
@@ -40,11 +51,9 @@ Diarrhea is a common and potentially dangerous illness in children, particularly
 Other solutions for treating diarrhea in children include rehydration therapy, which involves giving the child oral rehydration solution (ORS) or intravenous fluids to replace lost fluids and electrolytes. Additionally, it is important to continue feeding the child during and after the episode of diarrhea, as malnutrition can exacerbate the condition.
  
 
-```{r pressure, echo=FALSE}
-unicef_indicator <- read.csv("unicef_indicator_2.csv")
-```
+
 ```{r}
-plot <- ggplot(unicef_indicator, aes(x = time_period, y = obs_value)) +
+plot <- ggplot(unicef_indicator2, aes(x = time_period, y = obs_value)) +
   geom_bar(stat = "identity") +
   labs(x = NULL, y = "% of children treated (< age 5)", title = "Treatment ") +
   guides(fill = FALSE)
@@ -57,8 +66,7 @@ plotly_plot
 Advancements in medical technology and healthcare have led to significant increases in life expectancy over the past century. Early detection and treatment of diseases and illnesses have played a crucial role in improving life expectancy. When an illness or disease is detected and treated early, the chances of a successful recovery increase, which can lead to a longer and healthier life.
 The treatment coverage of the percentage of the children has been grown over the years, and it is increasing rapidly.
 ```{r}
-unicef_indicator <- read.csv("unicef_indicator_1.csv")
-unicef_metadata <- read.csv("unicef_metadata1.csv")
+
 
 unicef_join <- left_join(unicef_indicator, unicef_metadata, by="region")
 
@@ -69,10 +77,9 @@ ggplot(unicef_join, aes(x = life, y = obs_value)) +
 ```
 
 ```{r}
-unicef_indicator <- read.csv("unicef_indicator_2.csv")
-unicef_metadata <- read.csv("unicef_metadata1.csv")
 
-unicef_ts_data <- ts(unicef_indicator$obs_value, start = c(2005), end = c(2021), frequency = 1)
+
+unicef_ts_data <- ts(unicef_indicator2$obs_value, start = c(2005), end = c(2021), frequency = 1)
 
 plot(unicef_ts_data, type = "l", xlab = "Years", ylab = "% of children treated (< age 5)", 
      main = "Treatment of Diarrhoea Over Time")
@@ -87,13 +94,7 @@ Preventative measures play a crucial role in preventing disease transmission and
 
 
 ```{r}
-library(ggplot2)              
-library(tidyverse)            
-if (!require("mapdata")) install.packages("mapdata", dependencies = TRUE)
-library(mapdata)
 
-unicef_indicator <- read.csv("unicef_indicator_1.csv")
-View(unicef_indicator)
 
 mapdata <- map_data("world") 
 View(mapdata)
@@ -113,10 +114,6 @@ mapData2 <- mapData1 + scale_fill_gradient(name = "Diarrhoea treatment", low = "
         rect = element_blank())
 mapData2
 
-if (!require("cowplot")) install.packages("cowplot", dependencies = TRUE)
-library(cowplot)
-if (!require("magick")) install.packages("magick", dependencies = TRUE)
-library(magick)
 
 
 ggdraw() +
